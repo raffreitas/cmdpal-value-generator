@@ -30,7 +30,7 @@ namespace ValueGenerator.Helpers
 
             return command is "md5" or "sha1" or "sha256" or "sha384" or "sha512"
                 or "base64" or "base64d" or "url" or "urld" or "esc:data" or "uesc:data"
-                or "esc:hex" or "uesc:hex";
+                or "esc:hex" or "uesc:hex" or "ulid";
         }
 
         /// <summary>
@@ -82,6 +82,12 @@ namespace ValueGenerator.Helpers
         [
             new()
             {
+                Keyword = "ulid",
+                Description = "Generate a time-ordered ULID",
+                Example = "ulid",
+            },
+            new()
+            {
                 Keyword = "guid",
                 Description = GetStringFormat(GeneratorDescriptionUuid),
                 Example = "guid (aliases: uuid, guid4, guidv4, uuid4, uuidv4)",
@@ -120,31 +126,31 @@ namespace ValueGenerator.Helpers
             {
                 Keyword = "md5",
                 Description = GetStringFormat(GeneratorDescriptionHash, "MD5"),
-                Example = "md5 <your input>",
+                Example = "md5 <text> (omit text to hash clipboard)",
             },
             new()
             {
                 Keyword = "sha1",
                 Description = GetStringFormat(GeneratorDescriptionHash, "SHA1"),
-                Example = "sha1 <your input>",
+                Example = "sha1 <text> (omit text to hash clipboard)",
             },
             new()
             {
                 Keyword = "sha256",
                 Description = GetStringFormat(GeneratorDescriptionHash, "SHA256"),
-                Example = "sha256 <your input>",
+                Example = "sha256 <text> (omit text to hash clipboard)",
             },
             new()
             {
                 Keyword = "sha384",
                 Description = GetStringFormat(GeneratorDescriptionHash, "SHA384"),
-                Example = "sha384 <your input>",
+                Example = "sha384 <text> (omit text to hash clipboard)",
             },
             new()
             {
                 Keyword = "sha512",
                 Description = GetStringFormat(GeneratorDescriptionHash, "SHA512"),
-                Example = "sha512 <your input>",
+                Example = "sha512 <text> (omit text to hash clipboard)",
             },
             new()
             {

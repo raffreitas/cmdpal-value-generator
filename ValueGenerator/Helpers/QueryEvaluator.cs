@@ -6,6 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using ValueGenerator.GUID;
 
 namespace ValueGenerator.Helpers;
 
@@ -15,7 +16,7 @@ internal static class QueryEvaluator
     {
         try
         {
-            var request = new InputParser().ParseInput(query);
+            var request = new InputParser(ClipboardHelper.GetText).ParseInput(query);
             if (!request.Compute())
             {
                 return Error(request.ErrorMessage);
@@ -28,6 +29,17 @@ internal static class QueryEvaluator
                 Subtitle = request.Description,
                 Icon = Icons.Generator,
             };
+
+            if (request is GUIDRequest)
+            {
+                var guid = new Guid(request.Result);
+                item.MoreCommands =
+                [
+                    CopyFormat(guid.ToString("N"), "Copy without hyphens"),
+                    CopyFormat(guid.ToString("D").ToUpperInvariant(), "Copy uppercase"),
+                    CopyFormat(guid.ToString("B"), "Copy with braces"),
+                ];
+            }
 
             return item;
         }
@@ -45,4 +57,6 @@ internal static class QueryEvaluator
         Icon = Icons.Generator,
     };
 
+    private static CommandContextItem CopyFormat(string value, string title) =>
+        new CommandContextItem(new CopyTextCommand(value) { Name = title }) { Title = title };
 }

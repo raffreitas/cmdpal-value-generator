@@ -15,6 +15,24 @@ namespace ValueGenerator
 {
     public class InputParser
     {
+        private readonly Func<string>? _readClipboard;
+
+        public InputParser(Func<string>? readClipboard = null)
+        {
+            _readClipboard = readClipboard;
+        }
+
+        private string ReadClipboardText()
+        {
+            var text = _readClipboard?.Invoke();
+            if (string.IsNullOrEmpty(text))
+            {
+                throw new FormatException("Clipboard is empty, unavailable, or does not contain text.");
+            }
+
+            return text;
+        }
+
         public IComputeRequest ParseInput(string query)
         {
             IComputeRequest request;
@@ -37,7 +55,7 @@ namespace ValueGenerator
 
                 if (content == string.Empty)
                 {
-                    throw new FormatException("Empty hash request");
+                    content = ReadClipboardText();
                 }
 
                 request = new HashRequest(HashAlgorithmName.MD5, Encoding.UTF8.GetBytes(content));
@@ -71,7 +89,7 @@ namespace ValueGenerator
 
                 if (content == string.Empty)
                 {
-                    throw new FormatException("Empty hash request");
+                    content = ReadClipboardText();
                 }
 
                 request = new HashRequest(algorithmName, Encoding.UTF8.GetBytes(content));
@@ -116,6 +134,10 @@ namespace ValueGenerator
                 {
                     request = new GUIDRequest(version);
                 }
+            }
+            else if (command.Equals("ulid", StringComparison.OrdinalIgnoreCase))
+            {
+                request = new Generators.Ulid.UlidRequest();
             }
             else if (command.Equals("base64", StringComparison.OrdinalIgnoreCase))
             {
