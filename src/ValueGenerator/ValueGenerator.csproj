@@ -102,7 +102,7 @@
 
   <Target Name="PreparePackageLicenses" BeforeTargets="AssignTargetPaths"
           DependsOnTargets="ResolvePackageAssets" Condition="'$(DesignTimeBuild)' != 'true'">
-    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)\..\build\Prepare-PackageLicenses.ps1&quot; -AssetsFile &quot;$(ProjectAssetsFile)&quot; -TargetFramework &quot;$(TargetFramework)&quot; -RuntimeIdentifier &quot;$(RuntimeIdentifier)&quot; -WindowsSdkPackageVersion &quot;$(WindowsSdkPackageVersion)&quot; -OutputDirectory &quot;$(IntermediateOutputPath)PackageLicenses&quot;" />
+    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)\..\..\build\Prepare-PackageLicenses.ps1&quot; -AssetsFile &quot;$(ProjectAssetsFile)&quot; -TargetFramework &quot;$(TargetFramework)&quot; -RuntimeIdentifier &quot;$(RuntimeIdentifier)&quot; -WindowsSdkPackageVersion &quot;$(WindowsSdkPackageVersion)&quot; -OutputDirectory &quot;$(IntermediateOutputPath)PackageLicenses&quot;" />
     <ReadLinesFromFile File="$(IntermediateOutputPath)PackageLicenses\files.list">
       <Output TaskParameter="Lines" ItemName="_PackageLicense" />
     </ReadLinesFromFile>

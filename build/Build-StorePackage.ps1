@@ -16,7 +16,7 @@ if ($Publisher -notmatch '^CN=' -or $Publisher -match 'CN=Microsoft Corporation'
     $PublisherDisplayName -eq 'A Lone Developer') {
     throw 'Use your own Partner Center identity, not the template publisher.'
 }
-if (!$OutputDirectory) { $OutputDirectory = Join-Path $repository 'ValueGenerator\AppPackages\Store' }
+if (!$OutputDirectory) { $OutputDirectory = Join-Path $repository 'src\ValueGenerator\AppPackages\Store' }
 $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 # A fresh destination prevents a stale package from being reported as this build's output.
 if ((Test-Path -LiteralPath $OutputDirectory) -and
@@ -24,18 +24,18 @@ if ((Test-Path -LiteralPath $OutputDirectory) -and
     throw "Output directory must be empty: $OutputDirectory"
 }
 [IO.Directory]::CreateDirectory($OutputDirectory) | Out-Null
-$sourceManifest = Join-Path $repository 'ValueGenerator\Package.appxmanifest'
+$sourceManifest = Join-Path $repository 'src\ValueGenerator\Package.appxmanifest'
 [xml]$manifest = Get-Content -LiteralPath $sourceManifest -Raw
 $version = $manifest.Package.Identity.Version
 $manifest.Package.Identity.Name = $IdentityName
 $manifest.Package.Identity.Publisher = $Publisher
 $manifest.Package.Properties.PublisherDisplayName = $PublisherDisplayName
-$manifestDirectory = Join-Path $repository 'ValueGenerator\obj\Store'
+$manifestDirectory = Join-Path $repository 'src\ValueGenerator\obj\Store'
 [IO.Directory]::CreateDirectory($manifestDirectory) | Out-Null
 $storeManifest = Join-Path $manifestDirectory 'Package.appxmanifest'
 $manifest.Save($storeManifest)
 
-& dotnet build (Join-Path $repository 'ValueGenerator\ValueGenerator.csproj') `
+& dotnet build (Join-Path $repository 'src\ValueGenerator\ValueGenerator.csproj') `
     -c Release -p:Platform=x64 --no-restore "-p:StoreManifestPath=$storeManifest" `
     -p:GenerateAppxPackageOnBuild=true -p:UapAppxPackageBuildMode=StoreUpload `
     -p:AppxPackageSigningEnabled=false -p:AppxBundle=Never "-p:AppxPackageDir=$OutputDirectory\"

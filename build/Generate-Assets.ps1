@@ -1,7 +1,7 @@
 # Generates Windows assets from the project's Fluent-inspired icon master.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
-$assetsDirectory = Join-Path $PSScriptRoot '..\ValueGenerator\Assets'
+$assetsDirectory = Join-Path $PSScriptRoot '..\src\ValueGenerator\Assets'
 $source = [Drawing.Image]::FromFile((Join-Path $assetsDirectory 'Source\ValueGenerator.png'))
 $sizes = @{
     'StoreLogo.png' = @(50, 50)
