@@ -6,7 +6,7 @@ PowerToys Run. A origem e a licença dos fontes portados estão em
 
 ## Compilar e testar
 
-Requisitos: Windows, .NET SDK 10, Visual Studio com os componentes de `.vsconfig`,
+Requisitos: Windows, .NET SDK 10, PowerShell 7 (`pwsh`), Visual Studio com os componentes de `.vsconfig`,
 Windows SDK 10.0.26100.0 e ferramentas de empacotamento MSIX.
 
 ```powershell
@@ -19,12 +19,34 @@ Os testes compilam diretamente os fontes de cálculo da extensão, sem iniciar o
 servidor COM e sem acessar o clipboard real. Incluem os testes originais portados,
 vetores conhecidos de hashes e GUID, round-trips, ULID e leitura simulada do clipboard.
 
-O projeto mantém os targets e as versões de pacotes do template. Em Release,
+O projeto preserva o framework e usa Windows SDK estável `10.0.26100.57`. Em Release,
 o trimming das dependências `Microsoft.Windows.SDK.NET` e `WinRT.Runtime` pode
 emitir `IL2104`, agrupando avisos `IL2081` do código de fallback dessas bibliotecas.
 Esses avisos não foram ocultados. O build Debug não apresentou warnings.
 O projeto apenas exclui o WinMD de interfaces do CmdPal da geração automática
-de registros de ativação, evitando `APPX1707`; os manifestos fonte permanecem iguais.
+de registros de ativação, evitando `APPX1707`. A capability `internetClient`, sem uso,
+foi removida; `runFullTrust` e o CLSID do servidor COM foram preservados.
+
+## Distribuição pela Microsoft Store
+
+A preparação para publicação privada está em
+[publicacao.md](docs/publicacao-msstore/publicacao.md). O workflow manual
+**Build Microsoft Store package** gera Release x64 self-contained, executa os
+testes e disponibiliza `.msixupload`, MSIX e resultados. Configure primeiro as três
+variáveis públicas de identidade do Partner Center descritas no guia. Ele não
+publica automaticamente e não precisa de certificado local.
+
+As licenças e os avisos das dependências acompanham o pacote em `Licenses/`.
+Veja a [política de privacidade](PRIVACY.md) e os
+[textos para a listagem](docs/publicacao-msstore/store-listing.en-US.md).
+O cadastro, screenshots reais, WACK e submissão final ainda dependem da etapa de
+publicação; a extensão não está publicada na Store.
+
+A arte original fica em `ValueGenerator/Assets/Source/ValueGenerator.png`.
+Para regenerar os tamanhos do pacote em Windows: `./build/Generate-Assets.ps1`.
+O ícone segue a linguagem visual de aplicativos Fluent, com fundo transparente,
+e também é usado nos comandos do CmdPal. O pacote oculta seu atalho no menu Iniciar
+para evitar um segundo resultado como aplicativo na busca do CmdPal.
 
 ## Deploy pelo Visual Studio
 
