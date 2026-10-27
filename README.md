@@ -10,8 +10,8 @@ Requisitos: Windows, .NET SDK 10, Visual Studio com os componentes de `.vsconfig
 Windows SDK 10.0.26100.0 e ferramentas de empacotamento MSIX.
 
 ```powershell
-dotnet restore ValueGenerator.sln -p:Platform=x64
-dotnet build ValueGenerator.sln -p:Platform=x64 --no-restore
+dotnet restore ValueGenerator.slnx -p:Platform=x64
+dotnet build ValueGenerator.slnx -p:Platform=x64 --no-restore
 dotnet test ValueGenerator.UnitTests/ValueGenerator.UnitTests.csproj -p:Platform=x64 --no-restore
 ```
 
@@ -28,7 +28,7 @@ de registros de ativação, evitando `APPX1707`; os manifestos fonte permanecem 
 
 ## Deploy pelo Visual Studio
 
-1. Abra `ValueGenerator.sln` e defina `ValueGenerator` como projeto de inicialização.
+1. Abra `ValueGenerator.slnx` e defina `ValueGenerator` como projeto de inicialização.
 2. Selecione `Debug`, plataforma `x64` (ou `ARM64` em um computador ARM64) e o perfil
    **ValueGenerator (Package)**.
 3. Ative o Modo de Desenvolvedor do Windows, se o Visual Studio solicitar.
