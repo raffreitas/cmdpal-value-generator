@@ -35,6 +35,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
+        AppListEntry="none"
         DisplayName="Value Generator"
         Description="Value Generator"
         BackgroundColor="transparent"

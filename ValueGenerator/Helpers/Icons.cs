@@ -8,6 +8,5 @@ namespace ValueGenerator.Helpers;
 
 internal static class Icons
 {
-    // Code glyph from Segoe Fluent Icons.
-    internal static IconInfo Generator => new("\uE943");
+    internal static IconInfo Generator => IconHelpers.FromRelativePath("Assets\\Square44x44Logo.scale-200.png");
 }
