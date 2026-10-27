@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ValueGenerator (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "ValueGenerator (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

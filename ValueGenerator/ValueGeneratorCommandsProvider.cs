@@ -1,0 +1,34 @@
+// Copyright (c) Microsoft Corporation
+// The Microsoft Corporation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using Microsoft.CommandPalette.Extensions;
+using Microsoft.CommandPalette.Extensions.Toolkit;
+
+namespace ValueGenerator;
+
+public partial class ValueGeneratorCommandsProvider : CommandProvider
+{
+    private readonly ICommandItem[] _commands;
+    private readonly SettingsManager _settingsManager = new();
+
+    public ValueGeneratorCommandsProvider()
+    {
+        DisplayName = "Value Generator";
+        Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
+        _commands = [
+            new CommandItem(new ValueGeneratorPage())
+            {
+                Title = DisplayName,
+                MoreCommands = [new CommandContextItem(_settingsManager.Settings.SettingsPage)],
+            },
+        ];
+
+        Settings = _settingsManager.Settings;
+    }
+
+    public override ICommandItem[] TopLevelCommands()
+    {
+        return _commands;
+    }
+}
