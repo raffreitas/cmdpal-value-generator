@@ -12,6 +12,7 @@ public partial class ValueGeneratorCommandsProvider : CommandProvider
 {
     private readonly ICommandItem[] _commands;
     private readonly SettingsManager _settingsManager = new();
+    private readonly FallbackValueGeneratorItem _fallback = new();
 
     public ValueGeneratorCommandsProvider()
     {
@@ -33,4 +34,6 @@ public partial class ValueGeneratorCommandsProvider : CommandProvider
     {
         return _commands;
     }
+
+    public override IFallbackCommandItem[] FallbackCommands() => [_fallback];
 }

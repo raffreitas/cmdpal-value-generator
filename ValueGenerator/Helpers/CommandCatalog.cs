@@ -14,6 +14,25 @@ namespace ValueGenerator.Helpers
     /// </summary>
     internal static class CommandCatalog
     {
+        internal static bool IsKnownQuery(string query)
+        {
+            var terms = query.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+            if (terms.Length == 0)
+            {
+                return false;
+            }
+
+            var command = terms[0].ToLowerInvariant();
+            if (command.StartsWith("guid", StringComparison.Ordinal) || command.StartsWith("uuid", StringComparison.Ordinal))
+            {
+                return command[4..] is "" or "1" or "3" or "4" or "5" or "7" or "v1" or "v3" or "v4" or "v5" or "v7";
+            }
+
+            return command is "md5" or "sha1" or "sha256" or "sha384" or "sha512"
+                or "base64" or "base64d" or "url" or "urld" or "esc:data" or "uesc:data"
+                or "esc:hex" or "uesc:hex";
+        }
+
         /// <summary>
         /// a list of all value generator descriptions
         /// </summary>
