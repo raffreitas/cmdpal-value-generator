@@ -92,4 +92,12 @@
     <!-- In release, also ignore the aforementioned ILLink warning -->
     <ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors>
   </PropertyGroup>
+  <!-- The CmdPal WinMD defines interfaces, not activatable runtime classes. -->
+  <Target Name="SkipCmdPalInterfaceRegistration" BeforeTargets="_CalculateInputsForGenerateCurrentProjectAppxManifest">
+    <ItemGroup>
+      <PackagingOutputs Update="@(PackagingOutputs)" Condition="'%(PackagingOutputs.Filename)%(PackagingOutputs.Extension)' == 'Microsoft.CommandPalette.Extensions.winmd'">
+        <SkipHarvestingWinmdRegistration>true</SkipHarvestingWinmdRegistration>
+      </PackagingOutputs>
+    </ItemGroup>
+  </Target>
 </Project>

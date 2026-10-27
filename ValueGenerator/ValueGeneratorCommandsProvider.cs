@@ -4,6 +4,7 @@
 
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using ValueGenerator.Helpers;
 
 namespace ValueGenerator;
 
@@ -14,8 +15,9 @@ public partial class ValueGeneratorCommandsProvider : CommandProvider
 
     public ValueGeneratorCommandsProvider()
     {
+        Id = "ValueGenerator.Provider";
         DisplayName = "Value Generator";
-        Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
+        Icon = Icons.Generator;
         _commands = [
             new CommandItem(new ValueGeneratorPage())
             {
