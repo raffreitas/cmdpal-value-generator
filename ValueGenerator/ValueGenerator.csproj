@@ -4,7 +4,7 @@
     <RootNamespace>ValueGenerator</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
-    <WindowsSdkPackageVersion>10.0.26100.68-preview</WindowsSdkPackageVersion>
+    <WindowsSdkPackageVersion>10.0.26100.57</WindowsSdkPackageVersion>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
@@ -17,17 +17,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\**\*.png" Exclude="Assets\Source\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!-- Store builds use a generated manifest; local deployment keeps its identity. -->
+  <ItemGroup Condition="'$(StoreManifestPath)' != ''">
+    <AppxManifest Include="$(StoreManifestPath)" />
   </ItemGroup>
 
   <!--
@@ -98,6 +97,21 @@
       <PackagingOutputs Update="@(PackagingOutputs)" Condition="'%(PackagingOutputs.Filename)%(PackagingOutputs.Extension)' == 'Microsoft.CommandPalette.Extensions.winmd'">
         <SkipHarvestingWinmdRegistration>true</SkipHarvestingWinmdRegistration>
       </PackagingOutputs>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PreparePackageLicenses" BeforeTargets="AssignTargetPaths"
+          DependsOnTargets="ResolvePackageAssets" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)\..\build\Prepare-PackageLicenses.ps1&quot; -AssetsFile &quot;$(ProjectAssetsFile)&quot; -TargetFramework &quot;$(TargetFramework)&quot; -RuntimeIdentifier &quot;$(RuntimeIdentifier)&quot; -WindowsSdkPackageVersion &quot;$(WindowsSdkPackageVersion)&quot; -OutputDirectory &quot;$(IntermediateOutputPath)PackageLicenses&quot;" />
+    <ReadLinesFromFile File="$(IntermediateOutputPath)PackageLicenses\files.list">
+      <Output TaskParameter="Lines" ItemName="_PackageLicense" />
+    </ReadLinesFromFile>
+    <ItemGroup>
+      <Content Include="@(_PackageLicense)">
+        <Link>Licenses\%(_PackageLicense.Filename)%(_PackageLicense.Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
   </Target>
 </Project>
