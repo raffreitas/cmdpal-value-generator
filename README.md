@@ -1,119 +1,175 @@
-# Command Palette - Value Generator
+<p align="center">
+  <img src="src/ValueGenerator/Assets/Square150x150Logo.scale-200.png" alt="Value Generator icon" width="160" />
+</p>
 
-Extensão C# do PowerToys Command Palette baseada no plugin Value Generator do
-PowerToys Run. A origem e a licença dos fontes portados estão em
+<h1 align="center">
+  Value Generator<br />
+  for Command Palette
+</h1>
+
+<p align="center">
+  Generate GUIDs, ULIDs, hashes and encoded text without leaving
+  <a href="https://learn.microsoft.com/windows/powertoys/command-palette/overview">PowerToys Command Palette</a>.
+</p>
+
+---
+
+> [!NOTE]
+> This extension is a port of the **Value Generator** plugin from
+> [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) to Command Palette.
+> The generator logic, command syntax and original unit tests come from the
+> [Microsoft PowerToys repository](https://github.com/microsoft/PowerToys/tree/9e6593c34949d33fff03ba360846eca4be284f59/src/modules/launcher/Plugins/Community.PowerToys.Run.Plugin.ValueGenerator)
+> (MIT license). This is an independent project, not an official Microsoft product.
+
+Value Generator is a PowerToys Command Palette extension for the small values
+developers need all the time. Type a command such as `guid7`, `sha256 abc` or
+`base64 hello` and press Enter to copy the result to the clipboard.
+
+- **GUID / UUID** versions 1, 3, 4, 5 and 7, with extra copy formats.
+- **ULID** generation with a cryptographically secure random component.
+- **Hashes**: MD5, SHA-1, SHA-256, SHA-384 and SHA-512, from typed text or the clipboard.
+- **Encoding**: Base64, URL and URI data/hex escape and unescape.
+- **Fast access**: command suggestions, a main-search fallback and an optional `#` alias.
+
+Everything runs locally. The extension does not send your input anywhere and
+collects no telemetry. See the [privacy policy](PRIVACY.md).
+
+### What changed from the PowerToys Run plugin
+
+The original generators were adapted to run as a Command Palette extension:
+
+- Wox / PowerToys Run dependencies were replaced by the Command Palette extension SDK.
+- New **ULID** generator, plus extra GUID copy formats in the result's action menu.
+- Hash commands without input use the clipboard text.
+- Nullable reference types are enabled and hashing is safe for concurrent use.
+- Invalid hexadecimal escapes are now reported as errors.
+
+The origin, reference commit and license of each ported file are listed in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
-## Compilar e testar
+## Commands
 
-Requisitos: Windows, .NET SDK 10, PowerShell 7 (`pwsh`), Visual Studio com os componentes de `.vsconfig`,
-Windows SDK 10.0.26100.0 e ferramentas de empacotamento MSIX.
+| Command | Example or behavior |
+| --- | --- |
+| `guid`, `uuid` | GUID v4 |
+| `guid1`, `guid4`, `guid7` | GUID v1, v4, and .NET's native v7 |
+| `guid3`, `guid5` | `guid5 ns:DNS abc`, or an explicit namespace GUID and a name |
+| `md5`, `sha1`, `sha256`, `sha384`, `sha512` | `sha256 abc`; without input, hashes the clipboard text |
+| `base64`, `base64d` | `base64 Hello world`, `base64d YWJj` |
+| `url`, `urld` | `url a b+c`, `urld a+b%2bc` |
+| `esc:data`, `uesc:data` | URI data escape/unescape |
+| `esc:hex`, `uesc:hex` | `esc:hex z`, `uesc:hex %7A` |
+| `ulid` | ULID with a timestamp and cryptographic randomness, in Crockford Base32 |
+
+GUID versions also accept the original aliases `guidv1`, `uuid1`, `uuidv1` and
+their v3/v4/v5/v7 equivalents. Predefined namespaces: `ns:DNS`, `ns:URL`, `ns:OID`
+and `ns:X500`. GUID v3/v5 keep the original plugin's ASCII encoding and its
+no-spaces name syntax.
+
+An empty search shows suggestions; pressing Enter on a suggestion fills in the
+command. Pressing Enter on a result copies the value. The GUID result's action
+menu also copies the same GUID without hyphens, in uppercase or with braces.
+
+Commands are case-insensitive. Leading and trailing whitespace in the input is
+trimmed; inner spaces are preserved. Clipboard text is used as-is. An empty or
+non-text clipboard and invalid input show an error with no copy action. ULIDs sort
+by timestamp; order within the same millisecond is not guaranteed.
+
+> MD5 and SHA-1 are provided for compatibility, not for security-sensitive hashing.
+
+## `#` alias
+
+1. Open **Command Palette** settings and go to **Extensions**.
+2. Find **Value Generator** and expand the **Value Generator** command.
+3. Set **Alias** to `#` and enable **Direct** alias activation.
+4. Back in the main search, type `#` to open the page, then type `guid7`,
+   `sha256 abc` or any other command. The `#` is handled by Command Palette and is
+   not part of the extension's command syntax.
+
+When enabled in Command Palette settings, the fallback also recognizes commands
+typed directly in the main search, without `#`.
+
+## Build and test
+
+Requirements: Windows, .NET SDK 10, PowerShell 7 (`pwsh`), Visual Studio with the
+components in `.vsconfig`, Windows SDK 10.0.26100.0 and the MSIX packaging tools.
+
+```text
+src/ValueGenerator/              Command Palette extension (MSIX, COM server)
+tests/ValueGenerator.UnitTests/  MSTest unit tests
+build/                           Packaging and asset scripts
+```
 
 ```powershell
 dotnet restore ValueGenerator.slnx -p:Platform=x64
 dotnet build ValueGenerator.slnx -p:Platform=x64 --no-restore
-dotnet test ValueGenerator.UnitTests/ValueGenerator.UnitTests.csproj -p:Platform=x64 --no-restore
+dotnet test tests/ValueGenerator.UnitTests/ValueGenerator.UnitTests.csproj -p:Platform=x64 --no-restore
 ```
 
-Os testes compilam diretamente os fontes de cálculo da extensão, sem iniciar o
-servidor COM e sem acessar o clipboard real. Incluem os testes originais portados,
-vetores conhecidos de hashes e GUID, round-trips, ULID e leitura simulada do clipboard.
+The tests compile the extension's calculation sources directly, without starting
+the COM server or touching the real clipboard. They include the original ported
+tests, known hash and GUID vectors, round-trips, ULID checks and simulated
+clipboard reads.
 
-O projeto preserva o framework e usa Windows SDK estável `10.0.26100.57`. Em Release,
-o trimming das dependências `Microsoft.Windows.SDK.NET` e `WinRT.Runtime` pode
-emitir `IL2104`, agrupando avisos `IL2081` do código de fallback dessas bibliotecas.
-Esses avisos não foram ocultados. O build Debug não apresentou warnings.
-O projeto apenas exclui o WinMD de interfaces do CmdPal da geração automática
-de registros de ativação, evitando `APPX1707`. A capability `internetClient`, sem uso,
-foi removida; `runFullTrust` e o CLSID do servidor COM foram preservados.
+The project targets the stable Windows SDK `10.0.26100.57`. In Release, trimming
+the `Microsoft.Windows.SDK.NET` and `WinRT.Runtime` dependencies can emit `IL2104`,
+which groups `IL2081` warnings from those libraries' fallback code. These warnings
+are not suppressed. The Debug build has no warnings. The project only excludes the
+Command Palette interface WinMD from automatic activation registration, which avoids
+`APPX1707`. The unused `internetClient` capability was removed; `runFullTrust` and
+the COM server CLSID are kept.
 
-## Distribuição pela Microsoft Store
+## Deploy from Visual Studio
 
-A preparação para publicação privada está em
-[publicacao.md](docs/publicacao-msstore/publicacao.md). O workflow manual
-**Build Microsoft Store package** gera Release x64 self-contained, executa os
-testes e disponibiliza `.msixupload`, MSIX e resultados. Configure primeiro as três
-variáveis públicas de identidade do Partner Center descritas no guia. Ele não
-publica automaticamente e não precisa de certificado local.
+1. Open `ValueGenerator.slnx` and set `ValueGenerator` as the startup project.
+2. Select `Debug`, platform `x64` (or `ARM64` on an ARM64 machine) and the
+   **ValueGenerator (Package)** profile.
+3. Enable Windows Developer Mode if Visual Studio asks for it.
+4. Use **Build > Deploy Solution**, or right-click the `ValueGenerator` project and
+   select **Deploy**. Building alone does not register the MSIX.
+5. In Command Palette, search for `Reload` and run **Reload Command Palette extensions**.
+6. Open **Value Generator**. To debug the extension process, press F5 with the
+   package profile selected.
 
-As licenças e os avisos das dependências acompanham o pacote em `Licenses/`.
-Veja a [política de privacidade](PRIVACY.md) e os
-[textos para a listagem](docs/publicacao-msstore/store-listing.en-US.md).
-O cadastro, screenshots reais, WACK e submissão final ainda dependem da etapa de
-publicação; a extensão não está publicada na Store.
+If you get `APPX3217` because `UAP.props` is missing, install or repair Windows SDK
+10.0.26100 from the Visual Studio Installer; the target framework does not need to change.
 
-A arte original fica em `ValueGenerator/Assets/Source/ValueGenerator.png`.
-Para regenerar os tamanhos do pacote em Windows: `./build/Generate-Assets.ps1`.
-O ícone segue a linguagem visual de aplicativos Fluent, com fundo transparente,
-e também é usado nos comandos do CmdPal. O pacote oculta seu atalho no menu Iniciar
-para evitar um segundo resultado como aplicativo na busca do CmdPal.
+### Checks after deploying
 
-## Deploy pelo Visual Studio
+- Open the empty page, select a suggestion and confirm it fills in the search.
+- Copy `sha256 abc` and check the hash; copy a GUID in the three extra formats.
+- Run `guid7`, `guid5 ns:DNS abc`, `ulid`, Base64 and URL from the page and the fallback.
+- Confirm that `guidance` and `sha256sum abc` do not show the Value Generator fallback.
+- Confirm the errors for `base64d %%%`, `guid2` and `esc:hex ab` without the extension closing.
+- Copy some text and run only `sha256`; repeat with a non-text clipboard.
+- Confirm direct activation through `#`.
 
-1. Abra `ValueGenerator.slnx` e defina `ValueGenerator` como projeto de inicialização.
-2. Selecione `Debug`, plataforma `x64` (ou `ARM64` em um computador ARM64) e o perfil
-   **ValueGenerator (Package)**.
-3. Ative o Modo de Desenvolvedor do Windows, se o Visual Studio solicitar.
-4. Use **Build > Deploy Solution**, ou clique com o botão direito no projeto
-   `ValueGenerator` e selecione **Deploy**. Somente Build não registra o MSIX.
-5. No Command Palette, procure `Reload` e execute **Reload Command Palette extensions**.
-6. Abra **Value Generator**. Para depurar o processo da extensão, use F5 com o
-   perfil de pacote selecionado.
+## Microsoft Store distribution
 
-Se aparecer `APPX3217` por falta de `UAP.props`, instale ou repare o Windows SDK
-10.0.26100 pelo Visual Studio Installer; não é necessário alterar o target framework.
+The manual **Build Microsoft Store package** workflow builds a self-contained
+Release x64 package, runs the tests and uploads the `.msixupload`, the MSIX and the
+test results. First set the repository variables `STORE_IDENTITY_NAME`,
+`STORE_PUBLISHER` and `STORE_PUBLISHER_DISPLAY_NAME` to the public values from
+Partner Center > Product identity. The workflow does not publish anything and needs
+no local certificate. Locally, `./build/Build-StorePackage.ps1` does the same with
+those environment variables.
 
-## Alias `#`
+Dependency licenses and notices ship in the package under `Licenses/`. The extension
+is not yet published in the Store.
 
-1. Abra as configurações do **Command Palette** e vá a **Extensions**.
-2. Localize **Value Generator** e expanda o comando **Value Generator**.
-3. Defina **Alias** como `#` e habilite **Direct** / ativação direta do alias.
-4. Volte à busca principal e digite `#` para entrar na página; em seguida digite
-   `guid7`, `sha256 abc` ou outro comando. O `#` é tratado pelo CmdPal e não faz
-   parte da sintaxe do parser da extensão.
+The original artwork is `src/ValueGenerator/Assets/Source/ValueGenerator.png`.
+To regenerate the package sizes on Windows, run `./build/Generate-Assets.ps1`. The
+icon follows the Fluent app icon style with a transparent background and is also
+used for the Command Palette commands. The package hides its Start menu entry to
+avoid a duplicate app result in Command Palette search.
 
-O fallback também reconhece os comandos diretamente na busca principal, sem `#`,
-quando habilitado nas configurações do CmdPal.
+## References
 
-## Comandos
+- [Command Palette settings](https://learn.microsoft.com/windows/powertoys/command-palette/settings)
+- [Creating a Command Palette extension](https://learn.microsoft.com/windows/powertoys/command-palette/creating-an-extension)
+- [ULID specification](https://github.com/ulid/spec)
 
-| Comando | Exemplo ou comportamento |
-| --- | --- |
-| `guid`, `uuid` | GUID v4 |
-| `guid1`, `guid4`, `guid7` | GUID v1, v4 e v7 nativo do .NET |
-| `guid3`, `guid5` | `guid5 ns:DNS abc`, ou namespace GUID explícito e nome |
-| `md5`, `sha1`, `sha256`, `sha384`, `sha512` | `sha256 abc`; sem conteúdo, usa o texto do clipboard |
-| `base64`, `base64d` | `base64 Olá mundo`, `base64d YWJj` |
-| `url`, `urld` | `url a b+c`, `urld a+b%2bc` |
-| `esc:data`, `uesc:data` | Escape/unescape de dados URI |
-| `esc:hex`, `uesc:hex` | `esc:hex z`, `uesc:hex %7A` |
-| `ulid` | ULID com timestamp e aleatoriedade criptográfica, em Crockford Base32 |
+## License
 
-As versões de GUID também aceitam os aliases originais `guidv1`, `uuid1`, `uuidv1`
-e os equivalentes para v3/v4/v5/v7. Namespaces predefinidos: `ns:DNS`, `ns:URL`,
-`ns:OID` e `ns:X500`. GUID v3/v5 mantém a codificação ASCII e a sintaxe de nome
-sem espaços do plugin original.
-
-A busca vazia mostra sugestões; Enter em uma sugestão preenche o comando.
-Enter no resultado copia o valor. O menu de ações do resultado de GUID também
-oferece cópia sem hífens, em maiúsculas ou com chaves, usando o mesmo GUID exibido.
-
-O parser ignora maiúsculas/minúsculas dos comandos e remove espaços nas bordas
-do conteúdo digitado, preservando os espaços internos. O texto lido do clipboard
-é usado integralmente. Clipboard vazio ou sem texto e entradas inválidas mostram
-um erro sem ação de cópia. ULIDs são ordenáveis pelo timestamp; a ordem dentro do
-mesmo milissegundo não é garantida.
-
-## Verificação no CmdPal após o deploy
-
-- Abrir a página vazia, selecionar uma sugestão e conferir o preenchimento da busca.
-- Copiar `sha256 abc` e conferir o hash; copiar um GUID nos três formatos adicionais.
-- Executar `guid7`, `guid5 ns:DNS abc`, `ulid`, Base64 e URL pela página e pelo fallback.
-- Conferir que `guidance` e `sha256sum abc` não exibem o fallback do Value Generator.
-- Conferir erros em `base64d %%%`, `guid2` e `esc:hex ab` sem fechar a extensão.
-- Copiar texto e executar somente `sha256`; repetir com clipboard sem texto.
-- Conferir a ativação direta por `#`.
-
-Referências: [configurações do CmdPal](https://learn.microsoft.com/windows/powertoys/command-palette/settings),
-[desenvolvimento de extensões](https://learn.microsoft.com/windows/powertoys/command-palette/creating-an-extension),
-[especificação ULID](https://github.com/ulid/spec).
+[MIT](LICENSE). Portions are derived from Microsoft PowerToys; see
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
