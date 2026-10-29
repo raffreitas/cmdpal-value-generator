@@ -18,6 +18,9 @@ hexadecimal escapes as errors.
 CmdPal UI integration follows the PowerToys calculator extension at
 `src/modules/cmdpal/ext/Microsoft.CmdPal.Ext.Calc`, under the same MIT license.
 
+ULID support was added to this extension and was not part of the ported
+PowerToys Run plugin. Existing Microsoft notices remain on derived files.
+
 ## Packaged dependencies
 
 The MSIX includes a self-contained .NET runtime and Windows/WinRT components.
@@ -26,7 +29,9 @@ the applicable documents to `Licenses/` and generates `COMPONENTS.md` with the
 restored versions:
 
 - Microsoft.CommandPalette.Extensions (including Toolkit): MIT.
-- Microsoft.Windows.CsWinRT: MIT; its original license is included.
+- Microsoft.Windows.CsWinRT: MIT; its original license and `NOTICE.txt` are included
+  as `CsWinRT-LICENSE.txt` and `CsWinRT-NOTICE.txt`. The notices are retained in full,
+  including notices for tools that may not be present in the distributed runtime.
 - Shmuelie.WinRTServer: MIT; its original license is included.
 - .NET runtime: its LICENSE and THIRD-PARTY-NOTICES files are both included.
 - Windows SDK .NET projection: Microsoft Windows SDK license, included as

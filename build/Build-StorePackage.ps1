@@ -67,7 +67,8 @@ try {
     }
     $required = @('ValueGenerator.exe', 'ValueGenerator.runtimeconfig.json', 'coreclr.dll',
         'Licenses/LICENSE.txt', 'Licenses/THIRD-PARTY-NOTICES.md', 'Licenses/PRIVACY.md',
-        'Licenses/COMPONENTS.md', 'Licenses/CmdPal-LICENSE.txt', 'Licenses/CsWinRT-LICENSE.txt',
+        'Licenses/COMPONENTS.md', 'Licenses/SOURCES.md', 'Licenses/CmdPal-LICENSE.txt',
+        'Licenses/CsWinRT-LICENSE.txt', 'Licenses/CsWinRT-NOTICE.txt',
         'Licenses/WinRTServer-LICENSE.txt', 'Licenses/Windows-SDK-LICENSE.txt',
         'Licenses/NET-Runtime-LICENSE.txt', 'Licenses/NET-Runtime-THIRD-PARTY-NOTICES.txt')
     foreach ($name in $required) {

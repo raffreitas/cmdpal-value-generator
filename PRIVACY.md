@@ -1,6 +1,6 @@
 # Value Generator privacy policy
 
-Last updated: October 27, 2026
+Last updated: October 29, 2026
 
 Value Generator is an independently maintained extension for Microsoft PowerToys
 Command Palette. This policy describes the extension's own behavior.
@@ -10,8 +10,11 @@ Command Palette. This policy describes the extension's own behavior.
 The extension processes the text you enter locally on your computer to generate
 identifiers, calculate hashes, and encode or decode text. If you enter a hash
 command without text, the extension reads the current clipboard text to calculate
-the result. Selecting a copy action writes the displayed result or the selected
-GUID format to your clipboard.
+the result as the query is evaluated during typing. This also applies to recognized
+hash commands in the main-search fallback when that feature is enabled. You do not
+need to press Enter for this read to happen. Selecting a copy action (for example,
+pressing Enter on a result) writes the displayed result or the selected GUID format
+to your clipboard.
 
 Input, clipboard content and generated results are held in memory while the
 extension processes and displays them. The extension does not create a history

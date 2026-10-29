@@ -23,10 +23,12 @@ Guide for distributing your Command Palette extension through the Microsoft Stor
 
 | Channel | Package Format | Discovery | Auto-Updates |
 |---------|---------------|-----------|--------------|
-| Microsoft Store | MSIX bundle | Store app, `ms-windows-store://` link | Yes |
+| Microsoft Store | MSIX upload/package or bundle | Store app, direct link; curated Gallery listing | Yes |
 | WinGet | EXE installer | `winget install`, CmdPal browse | Yes (via manifest) |
 
-**Recommendation**: Publish to both for maximum reach. WinGet enables direct discovery from within Command Palette.
+For this repository, prepare the existing x64 Microsoft Store workflow first.
+WinGet distribution is optional and is not required for a Gallery listing that
+links to the Microsoft Store.
 
 ## Workflows
 
@@ -35,10 +37,10 @@ See [store-publishing.md](references/store-publishing.md) for the complete step-
 
 **Summary:**
 1. Register for Partner Center
-2. Update `Package.appxmanifest` and `.csproj` with Partner Center identity
-3. Build MSIX for x64 and ARM64
-4. Create MSIX bundle
-5. Submit to Partner Center
+2. Supply Partner Center identity through the existing Store build variables
+3. Build and validate the self-contained x64 `.msixupload`
+4. Validate the package and its bundled license documents
+5. Submit to Partner Center only when explicitly requested
 
 ### WinGet Publishing
 See [winget-publishing.md](references/winget-publishing.md) for the complete step-by-step guide.
@@ -62,5 +64,7 @@ See [winget-publishing.md](references/winget-publishing.md) for the complete ste
 
 - Your extension's CLSID (the `[Guid("...")]` in your main .cs file) must be unique and consistent across all files
 - WinGet manifests must include the `windows-commandpalette-extension` tag for CmdPal discovery
-- MSIX packages require both x64 and ARM64 builds for Store submission
-- WindowsAppSdk must be listed as a dependency in WinGet manifests
+- A single-architecture MSIX submission is supported; this workflow targets x64.
+- Preserve the local manifest and use the generated manifest for Store identity.
+- WinGet prerequisites must describe actual runtime dependencies; this project
+  does not require Windows App SDK merely because it is a CmdPal extension.

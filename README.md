@@ -17,9 +17,11 @@
 > [!NOTE]
 > This extension is a port of the **Value Generator** plugin from
 > [PowerToys Run](https://learn.microsoft.com/windows/powertoys/run) to Command Palette.
-> The generator logic, command syntax and original unit tests come from the
+> The original GUID, hash and encoding generators, command syntax and unit tests come from the
 > [Microsoft PowerToys repository](https://github.com/microsoft/PowerToys/tree/9e6593c34949d33fff03ba360846eca4be284f59/src/modules/launcher/Plugins/Community.PowerToys.Run.Plugin.ValueGenerator)
-> (MIT license). This is an independent project, not an official Microsoft product.
+> (MIT license). ULID support is an addition to this extension and was not part
+> of the ported PowerToys Run plugin. This is an independent project, not an
+> official Microsoft product.
 
 Value Generator is a PowerToys Command Palette extension for the small values
 developers need all the time. Type a command such as `guid7`, `sha256 abc` or
@@ -39,13 +41,35 @@ collects no telemetry. See the [privacy policy](PRIVACY.md).
 The original generators were adapted to run as a Command Palette extension:
 
 - Wox / PowerToys Run dependencies were replaced by the Command Palette extension SDK.
-- New **ULID** generator, plus extra GUID copy formats in the result's action menu.
+- Added **ULID** support and extra GUID copy formats in the result's action menu.
 - Hash commands without input use the clipboard text.
 - Nullable reference types are enabled and hashing is safe for concurrent use.
 - Invalid hexadecimal escapes are now reported as errors.
 
 The origin, reference commit and license of each ported file are listed in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+## Install and open
+
+Requires Microsoft PowerToys with **Command Palette** enabled. The Store build
+currently targets **x64** and includes the .NET runtime; users do not need the
+.NET SDK, Visual Studio or Developer Mode to install the Store version.
+
+1. Install [PowerToys](https://learn.microsoft.com/windows/powertoys/install)
+   and enable Command Palette in its settings.
+2. Install Value Generator from its Store listing once released. This extension
+   is not yet published; build artifacts are not a public Store installer.
+3. Open Command Palette (default shortcut: **Win+Alt+Space**) and search for
+   **Value Generator**. It has no separate Start menu entry.
+4. If it is not listed, run **Reload Command Palette extensions** from Command
+   Palette and search again.
+
+To uninstall, open **Windows Settings > Apps > Installed apps**, find
+**Value Generator**, and select **Uninstall**. Reload the Command Palette
+extensions if its command remains visible afterward.
+
+The package declares Windows build `19041` as its minimum. This declaration is
+not a guarantee of compatibility with every Windows or PowerToys version.
 
 ## Commands
 
@@ -69,6 +93,10 @@ no-spaces name syntax.
 An empty search shows suggestions; pressing Enter on a suggestion fills in the
 command. Pressing Enter on a result copies the value. The GUID result's action
 menu also copies the same GUID without hyphens, in uppercase or with braces.
+
+Hash commands without text read the clipboard while the query is evaluated
+during typing, including in the main-search fallback when enabled. Pressing
+Enter is not required for that read; Enter on a result copies its value.
 
 Commands are case-insensitive. Leading and trailing whitespace in the input is
 trimmed; inner spaces are preserved. Clipboard text is used as-is. An empty or
@@ -144,18 +172,7 @@ If you get `APPX3217` because `UAP.props` is missing, install or repair Windows 
 - Copy some text and run only `sha256`; repeat with a non-text clipboard.
 - Confirm direct activation through `#`.
 
-## Microsoft Store distribution
-
-The manual **Build Microsoft Store package** workflow builds a self-contained
-Release x64 package, runs the tests and uploads the `.msixupload`, the MSIX and the
-test results. First set the repository variables `STORE_IDENTITY_NAME`,
-`STORE_PUBLISHER` and `STORE_PUBLISHER_DISPLAY_NAME` to the public values from
-Partner Center > Product identity. The workflow does not publish anything and needs
-no local certificate. Locally, `./build/Build-StorePackage.ps1` does the same with
-those environment variables.
-
-Dependency licenses and notices ship in the package under `Licenses/`. The extension
-is not yet published in the Store.
+## Assets
 
 The original artwork is `src/ValueGenerator/Assets/Source/ValueGenerator.png`.
 To regenerate the package sizes on Windows, run `./build/Generate-Assets.ps1`. The
@@ -171,5 +188,6 @@ avoid a duplicate app result in Command Palette search.
 
 ## License
 
-[MIT](LICENSE). Portions are derived from Microsoft PowerToys; see
+[MIT](LICENSE), with original contributions by `raffreitas`. Portions are derived from Microsoft PowerToys; see
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Dependency licenses and notices are included in the package under `Licenses/`.

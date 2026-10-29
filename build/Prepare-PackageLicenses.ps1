@@ -34,6 +34,11 @@ Copy-License (Join-Path $repository 'LICENSE') 'LICENSE.txt'
 Copy-License (Join-Path $repository 'THIRD-PARTY-NOTICES.md') 'THIRD-PARTY-NOTICES.md'
 Copy-License (Join-Path $repository 'PRIVACY.md') 'PRIVACY.md'
 Copy-License (Join-Path $repository 'licenses\Windows-SDK-LICENSE.txt') 'Windows-SDK-LICENSE.txt'
+Copy-License (Join-Path $repository 'licenses\README.md') 'SOURCES.md'
+# These notices also ship outside the repository, with different relative paths.
+$noticesPath = Join-Path $OutputDirectory 'THIRD-PARTY-NOTICES.md'
+$notices = [IO.File]::ReadAllText($noticesPath).Replace('(LICENSE)', '(LICENSE.txt)').Replace('(licenses/README.md)', '(SOURCES.md)')
+[IO.File]::WriteAllText($noticesPath, $notices, [Text.UTF8Encoding]::new($false))
 
 $inventory = [Collections.Generic.List[string]]::new()
 $inventory.Add('# Packaged component licenses')
@@ -57,12 +62,18 @@ foreach ($name in @('Microsoft.CommandPalette.Extensions', 'Microsoft.Windows.Cs
     if ($name -eq 'Microsoft.CommandPalette.Extensions') {
         if ($metadata.package.metadata.license.InnerText -ne 'MIT') { throw 'Review the changed CmdPal SDK license.' }
         # The SDK declares MIT and is part of the same Microsoft PowerToys project.
-        Copy-License (Join-Path $repository 'LICENSE') $licenseName
+        Copy-License (Join-Path $repository 'licenses\PowerToys-MIT.txt') $licenseName
     }
     else {
         Copy-License (Join-Path $directory 'LICENSE') $licenseName
     }
-    $inventory.Add("- $($package.Key): MIT; $licenseName")
+    if ($name -eq 'Microsoft.Windows.CsWinRT') {
+        Copy-License (Join-Path $directory 'NOTICE.txt') 'CsWinRT-NOTICE.txt'
+        $inventory.Add("- $($package.Key): MIT; $licenseName and CsWinRT-NOTICE.txt")
+    }
+    else {
+        $inventory.Add("- $($package.Key): MIT; $licenseName")
+    }
 }
 
 $runtimeName = "Microsoft.NETCore.App.Runtime.$RuntimeIdentifier"
